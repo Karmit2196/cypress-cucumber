@@ -1,0 +1,62 @@
+{
+  "users": {
+    "validUser": {
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "test123",
+      "firstName": "Test",
+      "lastName": "User",
+      "address": "123 Test Street",
+      "country": "United States",
+      "state": "Test State",
+      "city": "Test City",
+      "zipcode": "12345",
+      "mobileNumber": "1234567890"
+    },
+    "invalidUser": {
+      "email": "invalid@example.com",
+      "password": "wrongpassword"
+    }
+  },
+  "products": {
+    "blueTop": {
+      "name": "Blue Top",
+      "price": "Rs. 500",
+      "category": "Women"
+    },
+    "menTshirt": {
+      "name": "Men Tshirt",
+      "price": "Rs. 400",
+      "category": "Men"
+    },
+    "sleevelessDress": {
+      "name": "Sleeveless Dress",
+      "price": "Rs. 1000",
+      "category": "Women"
+    }
+  },
+  "searchTerms": {
+    "valid": "dress",
+    "invalid": "nonexistentproduct",
+    "empty": ""
+  },
+  "categories": {
+    "women": "Women",
+    "men": "Men",
+    "kids": "Kids"
+  },
+  "brands": {
+    "polo": "Polo",
+    "hm": "H&M",
+    "madame": "Madame"
+  },
+  "contactForm": {
+    "name": "Test Contact",
+    "email": "contact@example.com",
+    "subject": "Test Subject",
+    "message": "This is a test message for contact form testing."
+  },
+  "subscription": {
+    "email": "subscription@example.com"
+  }
+} 

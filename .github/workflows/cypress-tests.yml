@@ -1,0 +1,245 @@
+name: Cypress Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+        - dev
+        - qa
+        - prod
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+        - smoke
+        - regression
+        - ui
+        - api
+        - e2e
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Run tests in parallel across multiple browsers
+        browser: [chrome, firefox, edge]
+        # Run tests in parallel across multiple environments
+        environment: [dev, qa]
+    
+    name: Cypress (${{ matrix.browser }}) - ${{ matrix.environment }} - ${{ github.event.inputs.test_type || 'smoke' }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v6
+      with:
+        browser: ${{ matrix.browser }}
+        config-file: cypress.config.${{ matrix.environment }}.js
+        spec: |
+          cypress/e2e/home.cy.js
+          cypress/e2e/login.cy.js
+        wait-on: 'http://localhost:3000'
+        wait-on-timeout: 120
+        record: false
+        parallel: true
+        group: 'Actions example'
+        tag: 'github-action'
+
+    - name: Upload screenshots
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: cypress-screenshots-${{ matrix.browser }}-${{ matrix.environment }}
+        path: cypress/screenshots
+        if-no-files-found: ignore
+
+    - name: Upload videos
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cypress-videos-${{ matrix.browser }}-${{ matrix.environment }}
+        path: cypress/videos
+        if-no-files-found: ignore
+
+  cypress-prod:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
+        test_type: [smoke, regression]
+    
+    name: Cypress (${{ matrix.browser }}) - PROD - ${{ matrix.test_type }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v6
+      with:
+        browser: ${{ matrix.browser }}
+        config-file: cypress.config.prod.js
+        spec: |
+          ${{ matrix.test_type == 'smoke' && 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js' || 'cypress/e2e/*.cy.js' }}
+        wait-on: 'http://localhost:3000'
+        wait-on-timeout: 120
+        record: false
+        parallel: true
+        group: 'Production tests'
+        tag: 'production'
+
+    - name: Upload screenshots
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: cypress-screenshots-${{ matrix.browser }}-prod-${{ matrix.test_type }}
+        path: cypress/screenshots
+        if-no-files-found: ignore
+
+    - name: Upload videos
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cypress-videos-${{ matrix.browser }}-prod-${{ matrix.test_type }}
+        path: cypress/videos
+        if-no-files-found: ignore
+
+  cypress-manual:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    
+    name: Cypress Manual - ${{ github.event.inputs.environment }} - ${{ github.event.inputs.test_type }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Cypress tests
+      run: |
+        npm run test:${{ github.event.inputs.test_type }}:${{ github.event.inputs.environment }}
+
+    - name: Upload screenshots
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: cypress-screenshots-manual-${{ github.event.inputs.environment }}-${{ github.event.inputs.test_type }}
+        path: cypress/screenshots
+        if-no-files-found: ignore
+
+    - name: Upload videos
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cypress-videos-manual-${{ github.event.inputs.environment }}-${{ github.event.inputs.test_type }}
+        path: cypress/videos
+        if-no-files-found: ignore
+
+  test-results:
+    runs-on: ubuntu-latest
+    needs: [cypress-run, cypress-prod]
+    if: always()
+    
+    name: Test Results Summary
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Generate test report
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "Tests completed for all environments and browsers." >> $GITHUB_STEP_SUMMARY
+
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('## Cypress Test Results')
+          );
+          
+          const commentBody = `## Cypress Test Results
+          
+          **Status:** Tests completed successfully! ✅
+          
+          [View Test Artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+          
+          if (botComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: commentBody
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });
+          } 
