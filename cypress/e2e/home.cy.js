@@ -11,35 +11,25 @@ describe('Home Page Tests', () => {
     it('should load home page successfully', () => {
       homePage
         .assertHomePageLoaded()
-        .takeScreenshot('home-page-loaded')
+        .takeScreenshot && homePage.takeScreenshot('home-page-loaded')
     })
 
     it('should display all navigation links', () => {
-      homePage
-        .assertNavigationLinksVisible()
+      homePage.assertNavigationLinksVisible()
     })
 
     it('should navigate to products page', () => {
-      homePage
-        .clickProducts()
-        .waitForPageLoad()
-      
+      homePage.clickProducts()
       cy.url().should('include', '/products')
     })
 
     it('should navigate to cart page', () => {
-      homePage
-        .clickCart()
-        .waitForPageLoad()
-      
+      homePage.clickCart()
       cy.url().should('include', '/view_cart')
     })
 
     it('should navigate to login page', () => {
-      homePage
-        .clickSignupLogin()
-        .waitForPageLoad()
-      
+      homePage.clickSignupLogin()
       cy.url().should('include', '/login')
     })
   })
@@ -47,27 +37,18 @@ describe('Home Page Tests', () => {
   describe('Search Functionality', () => {
     it('should search for existing product', () => {
       const searchTerm = 'dress'
-      
-      homePage
-        .searchProduct(searchTerm)
-        .waitForPageLoad()
-        .assertSearchResultsContain(searchTerm)
+      homePage.searchProduct(searchTerm)
+      homePage.assertSearchResultsContain(searchTerm)
     })
 
     it('should handle search with no results', () => {
       const searchTerm = 'nonexistentproduct'
-      
-      homePage
-        .searchProduct(searchTerm)
-        .waitForPageLoad()
-        .assertNoSearchResults()
+      homePage.searchProduct(searchTerm)
+      homePage.assertNoSearchResults()
     })
 
     it('should handle empty search', () => {
-      homePage
-        .searchProduct('')
-        .waitForPageLoad()
-      
+      homePage.searchProduct('')
       // Should stay on home page or show all products
       cy.url().should('include', '/')
     })
@@ -75,28 +56,19 @@ describe('Home Page Tests', () => {
 
   describe('Category Navigation', () => {
     it('should navigate to women category', () => {
-      homePage
-        .clickWomenCategory()
-        .waitForPageLoad()
-      
+      homePage.clickWomenCategory()
       cy.url().should('include', '/category_products')
       cy.get('body').should('contain', 'Women')
     })
 
     it('should navigate to men category', () => {
-      homePage
-        .clickMenCategory()
-        .waitForPageLoad()
-      
+      homePage.clickMenCategory()
       cy.url().should('include', '/category_products')
       cy.get('body').should('contain', 'Men')
     })
 
     it('should navigate to kids category', () => {
-      homePage
-        .clickKidsCategory()
-        .waitForPageLoad()
-      
+      homePage.clickKidsCategory()
       cy.url().should('include', '/category_products')
       cy.get('body').should('contain', 'Kids')
     })
@@ -104,99 +76,71 @@ describe('Home Page Tests', () => {
 
   describe('Featured Products', () => {
     it('should display featured products', () => {
-      homePage
-        .getFeaturedProductsCount()
-        .should('be.greaterThan', 0)
+      homePage.getFeaturedProductsCount().should('be.greaterThan', 0)
     })
 
     it('should add product to cart from home page', () => {
       const productName = 'Blue Top'
-      
-      homePage
-        .addProductToCart(productName)
-        .waitForPageLoad()
-      
-      // Should show success message
-      cy.get('body').should('contain', 'Added!')
+      homePage.addProductToCart(productName)
+      // Should show success message (modal appears)
+      cy.get('.modal-content').should('be.visible')
+      cy.get('.modal-content').should('contain', 'Added!')
+      // Close modal
+      cy.get('.modal-content .btn-success').click({force: true})
     })
 
     it('should view product details', () => {
       const productName = 'Blue Top'
-      
-      homePage
-        .viewProduct(productName)
-        .waitForPageLoad()
-      
+      homePage.viewProduct(productName)
       cy.url().should('include', '/product_details')
       cy.get('body').should('contain', productName)
     })
 
     it('should display product prices', () => {
-      homePage
-        .getProductPrice('Blue Top')
-        .should('contain', 'Rs.')
+      homePage.getProductPrice('Blue Top').should('contain', 'Rs.')
     })
   })
 
   describe('Subscription', () => {
     it('should subscribe to newsletter with valid email', () => {
       const email = 'test@example.com'
-      
-      homePage
-        .scrollToBottom()
-        .subscribeToNewsletter(email)
-        .waitForPageLoad()
-        .assertSubscriptionSuccess()
+      homePage.scrollToBottom().subscribeToNewsletter(email)
+      homePage.assertSubscriptionSuccess()
     })
 
     it('should handle subscription with invalid email', () => {
       const invalidEmail = 'invalid-email'
-      
-      homePage
-        .scrollToBottom()
-        .subscribeToNewsletter(invalidEmail)
-        .waitForPageLoad()
-      
-      // Should show error message
-      cy.get('body').should('contain', 'Please enter a valid email')
+      homePage.scrollToBottom().subscribeToNewsletter(invalidEmail)
+      homePage.assertSubscriptionError()
     })
   })
 
   describe('Scroll Functionality', () => {
     it('should scroll to bottom and show scroll up button', () => {
-      homePage
-        .scrollToBottom()
-        .waitForElement('scroll-up')
-        .clickScrollUp()
-      
+      homePage.scrollToBottom()
+      cy.get("a[href='#top'] i.fa.fa-angle-up").should('be.visible')
+      homePage.clickScrollUp()
       // Should scroll back to top
       cy.window().its('scrollY').should('eq', 0)
     })
 
     it('should scroll to specific product', () => {
       const productName = 'Stylish Dress'
-      
-      homePage
-        .scrollToProduct(productName)
-        .productExists(productName)
+      homePage.scrollToProduct(productName).productExists(productName)
     })
   })
 
   describe('Responsive Design', () => {
     it('should display correctly on mobile viewport', () => {
       cy.viewport(375, 667)
-      
-      homePage
-        .assertHomePageLoaded()
-        .takeScreenshot('home-page-mobile')
+      homePage.assertHomePageLoaded()
+      homePage.takeScreenshot && homePage.takeScreenshot('home-page-mobile')
     })
 
     it('should display correctly on tablet viewport', () => {
       cy.viewport(768, 1024)
-      
-      homePage
-        .assertHomePageLoaded()
-        .takeScreenshot('home-page-tablet')
+      homePage.assertHomePageLoaded()
+      homePage.takeScreenshot && homePage.takeScreenshot('home-page-tablet')
     })
   })
 

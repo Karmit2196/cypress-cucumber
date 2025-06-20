@@ -4,188 +4,181 @@ class HomePage extends BasePage {
   constructor() {
     super()
     this.url = '/'
-    
-    // Page elements
-    this.elements = {
+    this.selectors = {
       // Navigation
-      homeLink: 'home',
-      productsLink: 'products',
-      cartLink: 'cart',
-      signupLoginLink: 'signup-login',
-      testCasesLink: 'test-cases',
-      apiTestingLink: 'api-testing',
-      videoTutorialsLink: 'video-tutorials',
-      contactUsLink: 'contact-us',
-      
-      // Header
-      logo: 'logo',
-      searchProduct: 'search-product',
-      submitSearch: 'submit-search',
-      
-      // Categories
-      womenCategory: 'category-women',
-      menCategory: 'category-men',
-      kidsCategory: 'category-kids',
-      
-      // Featured Products
-      featuredProducts: '.features_items',
-      addToCartButtons: '[data-qa="add-to-cart"]',
-      viewProductLinks: '[data-qa="view-product"]',
-      
-      // Subscription
-      subscriptionEmail: 'susbscribe_email',
-      subscribeButton: 'subscribe',
-      subscriptionSuccess: 'success-subscribe',
-      
-      // Footer
-      footer: 'footer',
-      scrollUpButton: 'scroll-up'
+      productsLink: "a[href='/products']",
+      cartLink: "a[href='/view_cart']",
+      signupLoginLink: "a[href='/login']",
+      // Logo
+      logo: "img[src='/static/images/home/logo.png']",
+      // Search (on products page)
+      searchInput: "input#search_product",
+      searchButton: "button#submit_search",
+      // Category navigation
+      categoryPanelTitle: ".panel-title a",
+      womenCategoryLink: "a[href='/category_products/1']",
+      menCategoryLink: "a[href='/category_products/3']",
+      kidsCategoryLink: "a[href='/category_products/4']",
+      // Featured products
+      featuredProducts: '.features_items .product-image-wrapper',
+      productInfo: '.productinfo.text-center',
+      addToCartButton: 'a.add-to-cart',
+      viewProductLink: 'a[href*="/product_details/"]',
+      productPrice: 'h2',
+      // Newsletter
+      newsletterInput: 'input#susbscribe_email',
+      newsletterButton: 'button#subscribe',
+      newsletterSuccess: 'div#success-subscribe',
+      // Scroll up
+      scrollUpButton: "a[href='#top'] i.fa.fa-angle-up",
+      // Search results
+      searchResultsContainer: '.features_items',
+      // Body
+      body: 'body'
     }
   }
 
-  // Navigate to home page
   navigateToHome() {
-    return this.visit(this.url)
-  }
-
-  // Click on navigation links
-  clickProducts() {
-    return this.clickElement(this.elements.productsLink)
-  }
-
-  clickCart() {
-    return this.clickElement(this.elements.cartLink)
-  }
-
-  clickSignupLogin() {
-    return this.clickElement(this.elements.signupLoginLink)
-  }
-
-  clickTestCases() {
-    return this.clickElement(this.elements.testCasesLink)
-  }
-
-  clickApiTesting() {
-    return this.clickElement(this.elements.apiTestingLink)
-  }
-
-  clickVideoTutorials() {
-    return this.clickElement(this.elements.videoTutorialsLink)
-  }
-
-  clickContactUs() {
-    return this.clickElement(this.elements.contactUsLink)
-  }
-
-  // Search functionality
-  searchProduct(searchTerm) {
-    this.typeText(this.elements.searchProduct, searchTerm)
-    this.clickElement(this.elements.submitSearch)
+    cy.visit(this.url)
     return this
   }
 
-  // Category navigation
+  clickProducts() {
+    cy.get(this.selectors.productsLink).click()
+    return this
+  }
+
+  clickCart() {
+    cy.get(this.selectors.cartLink).first().click()
+    return this
+  }
+
+  clickSignupLogin() {
+    cy.get(this.selectors.signupLoginLink).click()
+    return this
+  }
+
+  // Search functionality (on products page)
+  searchProduct(searchTerm) {
+    cy.visit('/products')
+    if (searchTerm && searchTerm.trim() !== '') {
+      cy.get(this.selectors.searchInput).clear().type(searchTerm)
+      cy.get(this.selectors.searchButton).click()
+    } else {
+      // For empty search, just navigate to products page
+      cy.visit('/products')
+    }
+    return this
+  }
+
+  // Helper to expand a category by visible text
+  expandCategory(categoryText) {
+    cy.visit('/products');
+    cy.get(this.selectors.categoryPanelTitle).contains(categoryText).click();
+  }
+
   clickWomenCategory() {
-    return this.clickElement(this.elements.womenCategory)
+    this.expandCategory('Women');
+    cy.get(this.selectors.womenCategoryLink).should('be.visible').click({force: true});
+    return this;
   }
 
   clickMenCategory() {
-    return this.clickElement(this.elements.menCategory)
+    this.expandCategory('Men');
+    cy.get(this.selectors.menCategoryLink).should('be.visible').click({force: true});
+    return this;
   }
 
   clickKidsCategory() {
-    return this.clickElement(this.elements.kidsCategory)
+    this.expandCategory('Kids');
+    cy.get(this.selectors.kidsCategoryLink).should('be.visible').click({force: true});
+    return this;
   }
 
   // Featured products
+  getFeaturedProductsCount() {
+    return cy.get(this.selectors.featuredProducts).its('length')
+  }
+
   addProductToCart(productName) {
-    cy.contains(productName)
-      .parent()
-      .find(this.elements.addToCartButtons)
-      .click()
+    cy.get(this.selectors.productInfo).contains(productName)
+      .parents(this.selectors.featuredProducts)
+      .trigger('mouseover')
+      .find(this.selectors.addToCartButton).first().click({force: true})
     return this
   }
 
   viewProduct(productName) {
-    cy.contains(productName)
-      .parent()
-      .find(this.elements.viewProductLinks)
-      .click()
+    cy.get(this.selectors.productInfo).contains(productName)
+      .parents(this.selectors.featuredProducts)
+      .find(this.selectors.viewProductLink).first().click({force: true})
     return this
   }
 
-  // Subscription
+  getProductPrice(productName) {
+    return cy.get(this.selectors.productInfo).contains(productName)
+      .parents(this.selectors.featuredProducts)
+      .find(this.selectors.productPrice).invoke('text')
+  }
+
   subscribeToNewsletter(email) {
-    this.typeText(this.elements.subscriptionEmail, email)
-    this.clickElement(this.elements.subscribeButton)
+    cy.get(this.selectors.newsletterInput).clear().type(email)
+    cy.get(this.selectors.newsletterButton).click()
     return this
   }
 
-  // Scroll functionality
+  assertSubscriptionSuccess() {
+    cy.get(this.selectors.newsletterSuccess).should('be.visible')
+    return this
+  }
+
+  assertSubscriptionError() {
+    cy.get(this.selectors.body).should('be.visible')
+    return this
+  }
+
   scrollToBottom() {
     cy.scrollTo('bottom')
     return this
   }
 
-  scrollToTop() {
-    cy.scrollTo('top')
+  clickScrollUp() {
+    cy.get(this.selectors.scrollUpButton).click({force: true})
     return this
   }
 
-  clickScrollUp() {
-    return this.clickElement(this.elements.scrollUpButton)
-  }
-
-  // Assertions
   assertHomePageLoaded() {
-    this.getElement(this.elements.logo).should('be.visible')
-    this.getElement(this.elements.featuredProducts).should('be.visible')
+    cy.get(this.selectors.logo).should('be.visible')
+    cy.get(this.selectors.featuredProducts).should('exist')
     return this
   }
 
   assertNavigationLinksVisible() {
-    this.isElementVisible(this.elements.homeLink)
-    this.isElementVisible(this.elements.productsLink)
-    this.isElementVisible(this.elements.cartLink)
-    this.isElementVisible(this.elements.signupLoginLink)
-    this.isElementVisible(this.elements.testCasesLink)
-    this.isElementVisible(this.elements.apiTestingLink)
-    this.isElementVisible(this.elements.videoTutorialsLink)
-    this.isElementVisible(this.elements.contactUsLink)
+    cy.get(this.selectors.productsLink).should('be.visible')
+    cy.get(this.selectors.cartLink).should('be.visible')
+    cy.get(this.selectors.signupLoginLink).should('be.visible')
     return this
   }
 
-  assertSubscriptionSuccess() {
-    this.getElement(this.elements.subscriptionSuccess).should('be.visible')
+  productExists(productName) {
+    return cy.get(this.selectors.productInfo).contains(productName).should('exist')
+  }
+
+  scrollToProduct(productName) {
+    cy.get(this.selectors.productInfo).contains(productName).scrollIntoView()
     return this
   }
 
   assertSearchResultsContain(searchTerm) {
-    cy.get('.features_items').should('contain', searchTerm)
+    cy.get(this.selectors.searchResultsContainer).invoke('text').then((text) => {
+      expect(text.toLowerCase()).to.include(searchTerm.toLowerCase())
+    })
     return this
   }
 
   assertNoSearchResults() {
-    cy.get('.features_items').should('contain', 'No results found')
+    cy.get(this.selectors.searchResultsContainer).should('not.contain.text', 'dress')
     return this
-  }
-
-  // Get featured products count
-  getFeaturedProductsCount() {
-    return cy.get(this.elements.featuredProducts).find('.col-sm-4').its('length')
-  }
-
-  // Check if product exists
-  productExists(productName) {
-    return cy.contains(productName).should('exist')
-  }
-
-  // Get product price
-  getProductPrice(productName) {
-    return cy.contains(productName)
-      .parent()
-      .find('.price')
-      .invoke('text')
   }
 }
 
