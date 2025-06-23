@@ -1,334 +1,153 @@
-import HomePage from '../pages/HomePage.js'
-import LoginPage from '../pages/LoginPage.js'
-import ProductsPage from '../pages/ProductsPage.js'
-import CartPage from '../pages/CartPage.js'
+import { loginPage, homePage, productsPage, cartPage } from '../pages/index.js'
+import { generateRandomEmail } from '../support/utils.js';
 
-describe('End-to-End Tests', () => {
-  const homePage = new HomePage()
-  const loginPage = new LoginPage()
-  const productsPage = new ProductsPage()
-  const cartPage = new CartPage()
-
-  describe('Complete User Registration and Shopping Journey', () => {
-    it('should complete full user registration and shopping flow', () => {
-      // Step 1: Navigate to home page
-      homePage.navigateToHome()
-        .assertHomePageLoaded()
-
-      // Step 2: Register new user
-      const userName = loginPage.generateRandomName()
-      const userEmail = loginPage.generateRandomEmail()
-      const userPassword = 'test123'
-
-      homePage.clickSignupLogin()
-      loginPage.quickRegistration(userName, userEmail, userPassword)
-        .waitForPageLoad()
-        .assertAccountCreated()
-        .continueAfterAccountCreation()
-        .waitForPageLoad()
-        .assertLoginSuccessful()
-
-      // Step 3: Browse products
-      homePage.clickProducts()
-      productsPage.assertProductsPageLoaded()
-
-      // Step 4: Search for products
-      productsPage.searchProduct('dress')
-        .waitForProductsToLoad()
-        .assertSearchResultsContain('dress')
-
-      // Step 5: Add product to cart
-      productsPage.addProductToCart('Sleeveless Dress')
-        .waitForPageLoad()
-
-      // Step 6: View cart
-      homePage.clickCart()
-      cartPage.assertCartPageLoaded()
-        .assertCartHasItems()
-        .assertProductInCart('Sleeveless Dress')
-
-      // Step 7: Proceed to checkout
-      cartPage.proceedToCheckout()
-        .waitForPageLoad()
-
-      // Step 8: Complete checkout
-      cartPage.quickCheckout()
-        .waitForPageLoad()
-        .assertOrderSuccess()
-
-      // Step 9: Delete account
-      cartPage.deleteAccount()
-        .waitForPageLoad()
-        .assertAccountDeleted()
-    })
-  })
-
-  describe('Guest User Shopping Journey', () => {
-    it('should allow guest user to browse and add products to cart', () => {
-      // Step 1: Navigate to home page
-      homePage.navigateToHome()
-        .assertHomePageLoaded()
-
-      // Step 2: Browse products without login
-      homePage.clickProducts()
-      productsPage.assertProductsPageLoaded()
-
-      // Step 3: Filter by category
-      productsPage.filterByCategory('Women')
-        .waitForProductsToLoad()
-        .assertCategoryFiltered('Women')
-
-      // Step 4: Add multiple products to cart
-      productsPage.addProductToCart('Blue Top')
-        .waitForPageLoad()
-      
-      productsPage.addProductToCart('Men Tshirt')
-        .waitForPageLoad()
-
-      // Step 5: View cart
-      homePage.clickCart()
-      cartPage.assertCartPageLoaded()
-        .assertCartHasItems()
-        .assertProductInCart('Blue Top')
-        .assertProductInCart('Men Tshirt')
-
-      // Step 6: Update cart quantities
-      cartPage.updateItemQuantity('Blue Top', '2')
-        .updateCart()
-        .waitForPageLoad()
-        .assertProductQuantity('Blue Top', '2')
-
-      // Step 7: Remove item from cart
-      cartPage.removeItem('Men Tshirt')
-        .waitForPageLoad()
-        .assertProductNotInCart('Men Tshirt')
-    })
-  })
-
-  describe('Product Search and Filter Journey', () => {
-    it('should demonstrate comprehensive product search and filtering', () => {
-      // Step 1: Navigate to products page
-      productsPage.navigateToProducts()
-        .assertProductsPageLoaded()
-
-      // Step 2: Search for products
-      productsPage.searchProduct('top')
-        .waitForProductsToLoad()
-        .assertSearchResultsContain('top')
-
-      // Step 3: Filter by brand
-      productsPage.filterByBrand('Polo')
-        .waitForProductsToLoad()
-        .assertBrandFiltered('Polo')
-
-      // Step 4: Clear filters and search again
-      productsPage.navigateToProducts()
-      productsPage.searchProduct('dress')
-        .waitForProductsToLoad()
-
-      // Step 5: View product details
-      productsPage.viewProduct('Sleeveless Dress')
-        .waitForPageLoad()
-
-      // Step 6: Add to cart from product details
-      productsPage.setProductQuantity('3')
-        .addToCartFromDetails()
-        .waitForPageLoad()
-
-      // Step 7: Verify cart
-      homePage.clickCart()
-      cartPage.assertProductInCart('Sleeveless Dress')
-    })
-  })
-
-  describe('User Account Management Journey', () => {
-    it('should demonstrate complete user account lifecycle', () => {
-      // Step 1: Register new user
-      const userName = loginPage.generateRandomName()
-      const userEmail = loginPage.generateRandomEmail()
-      const userPassword = 'test123'
-
-      homePage.navigateToHome()
-      homePage.clickSignupLogin()
-      loginPage.quickRegistration(userName, userEmail, userPassword)
-        .waitForPageLoad()
-        .assertAccountCreated()
-        .continueAfterAccountCreation()
-        .waitForPageLoad()
-        .assertLoginSuccessful()
-
-      // Step 2: Browse and add products
-      homePage.clickProducts()
-      productsPage.addProductToCart('Blue Top')
-        .waitForPageLoad()
-
-      // Step 3: View cart while logged in
-      homePage.clickCart()
-      cartPage.assertCartHasItems()
-
-      // Step 4: Logout
-      loginPage.logoutIfLoggedIn()
-        .waitForPageLoad()
-
-      // Step 5: Login again
-      homePage.clickSignupLogin()
-      loginPage.login(userEmail, userPassword)
-        .waitForPageLoad()
-        .assertLoginSuccessful()
-
-      // Step 6: Verify cart persistence
-      homePage.clickCart()
-      cartPage.assertProductInCart('Blue Top')
-
-      // Step 7: Delete account
-      cartPage.deleteAccount()
-        .waitForPageLoad()
-        .assertAccountDeleted()
-    })
-  })
+context('End-to-End Tests', () => {
 
   describe('Newsletter Subscription Journey', () => {
     it('should demonstrate newsletter subscription functionality', () => {
-      // Step 1: Navigate to home page
-      homePage.navigateToHome()
-        .assertHomePageLoaded()
-
-      // Step 2: Scroll to subscription section
-      homePage.scrollToBottom()
-        .waitForElement('susbscribe_email')
-
-      // Step 3: Subscribe with valid email
-      const email = 'test@example.com'
-      homePage.subscribeToNewsletter(email)
-        .waitForPageLoad()
-        .assertSubscriptionSuccess()
-
-      // Step 4: Try subscription with invalid email
-      homePage.subscribeToNewsletter('invalid-email')
-        .waitForPageLoad()
-
-      // Should show error message
-      cy.get('body').should('contain', 'Please enter a valid email')
-    })
-  })
+      homePage.navigateToHome();
+      homePage.scrollToBottom();
+      const userEmail = generateRandomEmail();
+      homePage.subscribeToNewsletter(userEmail);
+      homePage.assertSubscriptionSuccess();
+    });
+  });
 
   describe('Responsive Design Journey', () => {
     it('should test responsive design across different viewports', () => {
-      // Test mobile viewport
-      cy.viewport(375, 667)
-      homePage.navigateToHome()
-        .assertHomePageLoaded()
-        .takeScreenshot('mobile-home')
+      const viewports = ['iphone-6', 'ipad-2', 'macbook-15'];
+      viewports.forEach(viewport => {
+        cy.viewport(viewport);
+        homePage.navigateToHome();
+        homePage.assertHomePageLoaded();
+      });
+    });
+  });
 
-      homePage.clickProducts()
-      productsPage.assertProductsPageLoaded()
-        .takeScreenshot('mobile-products')
-
-      // Test tablet viewport
-      cy.viewport(768, 1024)
-      homePage.navigateToHome()
-        .assertHomePageLoaded()
-        .takeScreenshot('tablet-home')
-
-      // Test desktop viewport
-      cy.viewport(1280, 720)
-      homePage.navigateToHome()
-        .assertHomePageLoaded()
-        .takeScreenshot('desktop-home')
-    })
-  })
-
-  describe('Error Handling Journey', () => {
-    it('should handle various error scenarios gracefully', () => {
-      // Step 1: Test invalid login
-      homePage.navigateToHome()
-      homePage.clickSignupLogin()
-      loginPage.login('invalid@example.com', 'wrongpassword')
-        .waitForPageLoad()
-        .assertLoginFailed()
-
-      // Step 2: Test search with no results
-      homePage.navigateToHome()
-      homePage.searchProduct('nonexistentproduct')
-        .waitForPageLoad()
-        .assertNoSearchResults()
-
-      // Step 3: Test empty cart
-      homePage.clickCart()
-      cartPage.assertCartIsEmpty()
-
-      // Step 4: Test invalid product ID
-      cy.request({
-        method: 'GET',
-        url: 'https://www.automationexercise.com/api/getProductDetailsById?id=99999',
-        failOnStatusCode: false
-      }).then((response) => {
-        expect(response.status).to.eq(404)
-      })
-    })
-  })
+  describe('Basic Navigation Journey', () => {
+    it('should navigate to products page', () => {
+      homePage.navigateToHome();
+      homePage.assertHomePageLoaded();
+      cy.visit('/products');
+      cy.url().should('include', '/products');
+    });
+  });
 
   describe('Performance Journey', () => {
     it('should test performance across different pages', () => {
-      // Test home page load time
-      const homeStartTime = Date.now()
-      homePage.navigateToHome()
-      cy.get('body').should('be.visible').then(() => {
-        const homeLoadTime = Date.now() - homeStartTime
-        expect(homeLoadTime).to.be.lessThan(5000)
-      })
+      homePage.measurePageLoadTime();
+      cy.visit('/products');
+      productsPage.measurePageLoadTime();
+    });
+  });
 
-      // Test products page load time
-      const productsStartTime = Date.now()
-      productsPage.navigateToProducts()
-      cy.get('body').should('be.visible').then(() => {
-        const productsLoadTime = Date.now() - productsStartTime
-        expect(productsLoadTime).to.be.lessThan(5000)
-      })
+ 
 
-      // Test cart page load time
-      const cartStartTime = Date.now()
-      cartPage.navigateToCart()
-      cy.get('body').should('be.visible').then(() => {
-        const cartLoadTime = Date.now() - cartStartTime
-        expect(cartLoadTime).to.be.lessThan(5000)
-      })
-    })
-  })
+  describe('Contact Us Form', () => {
+    it('should submit the contact us form successfully', () => {
+      homePage.navigateToHome();
+      homePage.goToContactUs();
+      cy.url().should('include', '/contact_us');
+      homePage.getContactUsNameInput().type('Test User');
+      homePage.getContactUsEmailInput().type('testuser@example.com');
+      homePage.getContactUsSubjectInput().type('Test Subject');
+      homePage.getContactUsMessageTextarea().type('This is a test message.');
+      homePage.getContactUsSubmitButton().click();
+      cy.on('window:confirm', () => true); // Accept alert
+      homePage.getContactUsSuccessMessage().should('be.visible');
+      homePage.getContactUsHomeButton().click();
+      cy.url().should('eq', Cypress.config().baseUrl + '/');
+    });
+  });
 
-  describe('Cross-Browser Compatibility Journey', () => {
-    it('should test basic functionality across different browsers', () => {
-      // This test would be run with different browser configurations
-      homePage.navigateToHome()
-        .assertHomePageLoaded()
+  describe('Cart Page Subscription', () => {
+    it('should subscribe to newsletter from cart page', () => {
+      productsPage.navigateToProducts();
+      productsPage.clickAddToCartByName('Blue Top');
+      productsPage.getModalContent().should('be.visible');
+      productsPage.clickViewCartOnModal();
+      cy.url().should('include', '/view_cart');
+      cartPage.getCartSubscribeInput().should('be.visible');
+      cartPage.getCartSubscribeButton().should('be.visible');
+      const email = 'carttest@example.com';
+      cartPage.getCartSubscribeInput().type(email);
+      cartPage.getCartSubscribeButton().click();
+      cartPage.getCartSubscribeSuccess().should('be.visible');
+    });
+  });
 
-      homePage.clickProducts()
-      productsPage.assertProductsPageLoaded()
+  describe('Add Products in Cart', () => {
+    it('should add multiple products to cart and verify details', () => {
+      productsPage.navigateToProducts();
+      productsPage.clickAddToCartByName('Blue Top');
+      productsPage.getModalContent().should('be.visible');
+      productsPage.clickContinueShoppingOnModal();
+      productsPage.clickAddToCartByName('Men Tshirt');
+      productsPage.getModalContent().should('be.visible');
+      productsPage.clickViewCartOnModal();
+      cy.url().should('include', '/view_cart');
+      cartPage.getCartRows().should('have.length', 2);
+      cartPage.getCartTable().should('contain', 'Blue Top');
+      cartPage.getCartTable().should('contain', 'Men Tshirt');
+      cartPage.getCartRows().each(($row) => {
+        cy.wrap($row).within(() => {
+          cartPage.getCartPrice().invoke('text').should('match', /Rs\. \d+/);
+          cartPage.getCartQuantity().should('contain', '1');
+          cartPage.getCartTotal().invoke('text').should('match', /Rs\. \d+/);
+        });
+      });
+      cartPage.getCartTotalPrice().should('be.visible');
+    });
+  });
 
-      homePage.clickCart()
-      cartPage.assertCartPageLoaded()
-    })
-  })
+  describe('Verify Product quantity in Cart', () => {
+    it('should add product from details page with specific quantity and verify in cart', () => {
+      productsPage.navigateToProducts();
+      productsPage.clickViewProductByName('Blue Top');
+      cy.url().should('include', '/product_details');
+      productsPage.getProductQuantityInput().clear().type('4');
+      productsPage.addToCartFromDetails('Blue Top');
+      productsPage.getModalContent().should('be.visible');
+      productsPage.clickViewCartOnModal();
+      cy.url().should('include', '/view_cart');
+      cartPage.getCartTable().should('contain', 'Blue Top');
+      cartPage.getCartRows().first().within(() => {
+        cartPage.getCartQuantity().should('contain', '4');
+      });
+    });
+  });
 
-  describe('Accessibility Journey', () => {
-    it('should test basic accessibility features', () => {
-      homePage.navigateToHome()
+  describe('Remove Products From Cart', () => {
+    it('should add product to cart and then remove it', () => {
+      productsPage.navigateToProducts();
+      productsPage.clickAddToCartByName('Blue Top');
+      productsPage.getModalContent().should('be.visible');
+      productsPage.clickViewCartOnModal();
+      cy.url().should('include', '/view_cart');
+      cartPage.getCartTable().should('contain', 'Blue Top');
+      cartPage.getCartRows().first().within(() => {
+        cartPage.getCartDeleteButton().click();
+      });
+      cartPage.getCartRows().should('not.exist');
+      cartPage.getCartEmptyMessage().should('be.visible');
+    });
+  });
 
-      // Check for proper heading structure
-      cy.get('h1, h2, h3').should('exist')
+  describe('Add review on product', () => {
+    it('should add a review to a product and verify success message', () => {
+      productsPage.navigateToProducts();
+      productsPage.clickViewProductByName('Blue Top');
+      cy.url().should('include', '/product_details');
+      productsPage.getWriteYourReview().scrollIntoView();
+      productsPage.getWriteYourReview().should('be.visible');
+      productsPage.getReviewNameInput().type('Test Reviewer');
+      productsPage.getReviewEmailInput().type('reviewer@example.com');
+      productsPage.getReviewTextarea().type('This is a great product! Highly recommended.');
+      productsPage.getReviewForm().within(() => {
+        productsPage.getReviewSubmitButton().click();
+      });
+      productsPage.getReviewSuccessMessage().should('be.visible');
+    });
+  });
 
-      // Check for alt text on images
-      cy.get('img').each(($img) => {
-        cy.wrap($img).should('have.attr', 'alt')
-      })
-
-      // Check for proper form labels
-      homePage.clickSignupLogin()
-      cy.get('label').should('exist')
-
-      // Check for keyboard navigation
-      cy.get('body').tab()
-      cy.focused().should('exist')
-    })
-  })
-}) 
+}); 

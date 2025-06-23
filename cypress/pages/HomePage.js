@@ -1,4 +1,5 @@
 import BasePage from './BasePage.js'
+import { measurePageLoadTime } from '../support/utils.js'
 
 class HomePage extends BasePage {
   constructor() {
@@ -26,15 +27,24 @@ class HomePage extends BasePage {
       viewProductLink: 'a[href*="/product_details/"]',
       productPrice: 'h2',
       // Newsletter
-      newsletterInput: 'input#susbscribe_email',
-      newsletterButton: 'button#subscribe',
-      newsletterSuccess: 'div#success-subscribe',
+      newsletterInput: '#susbscribe_email',
+      newsletterButton: '#subscribe',
+      newsletterSuccess: '#success-subscribe',
+      contactUsName: 'input[data-qa="name"]',
+      contactUsEmail: 'input[data-qa="email"]',
+      contactUsSubject: 'input[data-qa="subject"]',
+      contactUsMessage: 'textarea[data-qa="message"]',
+      contactUsSubmit: 'input[type="submit"]',
+      contactUsSuccess: 'Success! Your details have been submitted successfully.',
+      contactUsHome: 'Home',
       // Scroll up
       scrollUpButton: "a[href='#top'] i.fa.fa-angle-up",
       // Search results
       searchResultsContainer: '.features_items',
       // Body
-      body: 'body'
+      body: 'body',
+      modalContent: '.modal-content',
+      modalCloseButton: '.modal-content .btn-success'
     }
   }
 
@@ -122,14 +132,14 @@ class HomePage extends BasePage {
   }
 
   subscribeToNewsletter(email) {
-    cy.get(this.selectors.newsletterInput).clear().type(email)
-    cy.get(this.selectors.newsletterButton).click()
-    return this
+    this.getElement(this.selectors.newsletterInput).type(email);
+    this.getElement(this.selectors.newsletterButton).click();
+    return this;
   }
 
   assertSubscriptionSuccess() {
-    cy.get(this.selectors.newsletterSuccess).should('be.visible')
-    return this
+    cy.get(this.selectors.newsletterSuccess).should('be.visible');
+    return this;
   }
 
   assertSubscriptionError() {
@@ -179,6 +189,77 @@ class HomePage extends BasePage {
   assertNoSearchResults() {
     cy.get(this.selectors.searchResultsContainer).should('not.contain.text', 'dress')
     return this
+  }
+
+  measurePageLoadTime() {
+    measurePageLoadTime(5000, 'Home page');
+    return this;
+  }
+
+  // Dynamic element getters for POM
+  getBody() {
+    return this.getElement(this.selectors.body)
+  }
+
+  getModalContent() {
+    return this.getElement(this.selectors.modalContent)
+  }
+
+  getModalCloseButton() {
+    return this.getElement(this.selectors.modalCloseButton)
+  }
+
+  getImages() {
+    return this.getElement('img')
+  }
+
+  getHeadings() {
+    return this.getElement('h1, h2, h3')
+  }
+
+  getNewsletterInput() {
+    return this.getElement(this.selectors.newsletterInput);
+  }
+
+  getNewsletterButton() {
+    return this.getElement(this.selectors.newsletterButton);
+  }
+
+  getNewsletterSuccess() {
+    return cy.contains('You have been successfully subscribed!');
+  }
+
+  getContactUsNameInput() {
+    return this.getElement(this.selectors.contactUsName);
+  }
+
+  getContactUsEmailInput() {
+    return this.getElement(this.selectors.contactUsEmail);
+  }
+
+  getContactUsSubjectInput() {
+    return this.getElement(this.selectors.contactUsSubject);
+  }
+
+  getContactUsMessageTextarea() {
+    return this.getElement(this.selectors.contactUsMessage);
+  }
+
+  getContactUsSubmitButton() {
+    return this.getElement(this.selectors.contactUsSubmit);
+  }
+
+  getContactUsSuccessMessage() {
+    return cy.contains(this.selectors.contactUsSuccess);
+  }
+
+  getContactUsHomeButton() {
+    return cy.contains(this.selectors.contactUsHome);
+  }
+
+  goToContactUs() {
+    cy.contains('Contact us').click();
+    return this;
   }
 }
 

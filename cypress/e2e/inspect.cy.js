@@ -136,4 +136,59 @@ describe('Website Inspection', () => {
     // Take a screenshot for manual inspection
     cy.screenshot('home-page-inspection')
   })
+})
+
+describe('Login Page Inspection', () => {
+  it('should inspect the login and signup page structure', () => {
+    cy.visit('https://www.automationexercise.com/login')
+    cy.get('body').should('be.visible')
+
+    // Log the page title
+    cy.title().then((title) => {
+      cy.log('Page title:', title)
+    })
+
+    // Inspect login form
+    cy.get('.login-form').then(($form) => {
+      cy.log('Login form found:', $form.length > 0)
+      if ($form.length > 0) {
+        cy.log('Login form HTML:', $form.html().substring(0, 500))
+      }
+    })
+    cy.get('.login-form h2').then(($h2) => {
+      cy.log('Login form title:', $h2.text())
+    })
+    cy.get('.login-form input').each(($input, i) => {
+      cy.log(`Login input ${i + 1}: type="${$input.attr('type')}" name="${$input.attr('name')}" data-qa="${$input.attr('data-qa')}" placeholder="${$input.attr('placeholder')}"`)
+    })
+    cy.get('.login-form button').then(($btn) => {
+      cy.log('Login button:', $btn.text(), $btn.attr('data-qa'))
+    })
+    cy.get('.login-form p').then(($p) => {
+      if ($p.length > 0) cy.log('Login error message selector: .login-form p')
+    })
+
+    // Inspect signup form
+    cy.get('.signup-form').then(($form) => {
+      cy.log('Signup form found:', $form.length > 0)
+      if ($form.length > 0) {
+        cy.log('Signup form HTML:', $form.html().substring(0, 500))
+      }
+    })
+    cy.get('.signup-form h2').then(($h2) => {
+      cy.log('Signup form title:', $h2.text())
+    })
+    cy.get('.signup-form input').each(($input, i) => {
+      cy.log(`Signup input ${i + 1}: type="${$input.attr('type')}" name="${$input.attr('name')}" data-qa="${$input.attr('data-qa')}" placeholder="${$input.attr('placeholder')}"`)
+    })
+    cy.get('.signup-form button').then(($btn) => {
+      cy.log('Signup button:', $btn.text(), $btn.attr('data-qa'))
+    })
+    cy.get('.signup-form p').then(($p) => {
+      if ($p.length > 0) cy.log('Signup error message selector: .signup-form p')
+    })
+
+    // Take a screenshot for manual inspection
+    cy.screenshot('login-page-inspection')
+  })
 }) 

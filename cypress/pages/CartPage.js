@@ -1,4 +1,5 @@
 import BasePage from './BasePage.js'
+import users from '../fixtures/users.json'
 
 class CartPage extends BasePage {
   constructor() {
@@ -8,29 +9,33 @@ class CartPage extends BasePage {
     // Page elements
     this.elements = {
       // Page header
-      cartTitle: '.title',
+      cartTitle: '#cart_info .cart_description h4 a',
       
       // Cart table
-      cartTable: '.cart_info',
-      cartItems: '.cart_item',
-      productName: '.cart_description h4 a',
-      productPrice: '.cart_price p',
-      productQuantity: '.cart_quantity button',
-      productTotal: '.cart_total p',
+      cartTable: '#cart_info_table',
+      cartRows: '#cart_info_table tbody tr',
+      cartPrice: '.cart_price',
+      cartQuantity: '.cart_quantity',
+      cartTotal: '.cart_total',
+      cartTotalPrice: '.cart_total_price',
+      cartDeleteButton: '.cart_delete a',
+      cartEmptyMessage: 'Cart is empty!',
+      cartSubscribeInput: '#susbscribe_email',
+      cartSubscribeButton: '#subscribe',
+      cartSubscribeSuccess: 'You have been successfully subscribed!',
       
       // Product actions
-      removeButton: 'remove-from-cart',
+      removeButton: '.cart_quantity_delete',
       updateQuantity: 'quantity',
       updateCartButton: 'update-cart',
       
       // Cart summary
-      cartTotal: '.cart_total_price',
       subtotal: '.cart_total_price .cart_total',
       tax: '.cart_total_price .cart_total_tax',
       total: '.cart_total_price .cart_total_amount',
       
       // Checkout
-      proceedToCheckoutButton: 'checkout',
+      proceedToCheckoutButton: '.btn.btn-default.check_out',
       continueShoppingButton: 'continue-shopping',
       
       // Checkout form
@@ -45,25 +50,26 @@ class CartPage extends BasePage {
       country: 'country',
       
       // Payment
-      cardName: 'name_on_card',
-      cardNumber: 'card_number',
-      cvc: 'cvc',
-      expiryMonth: 'expiry_month',
-      expiryYear: 'expiry_year',
-      payAndConfirmButton: 'pay-button',
+      cardName: '[data-qa="name-on-card"]',
+      cardNumber: '[data-qa="card-number"]',
+      cvc: '[data-qa="cvc"]',
+      expiryMonth: '[data-qa="expiry-month"]',
+      expiryYear: 'input[name="expiry_year"]',
+      payAndConfirmButton: '#submit',
       
       // Order confirmation
       orderConfirmation: '.order-confirmation',
       orderNumber: '.order-number',
-      orderSuccess: '.order-success',
+      orderSuccess: '#success_message .alert-success',
       
       // Messages
-      emptyCartMessage: '.empty-cart',
       cartUpdatedMessage: '.cart-updated',
       
       // Navigation
       homeButton: 'home',
-      productsButton: 'products'
+      productsButton: 'products',
+      cartInfoTable: '#cart_info_table',
+      breadcrumb: '.breadcrumb'
     }
   }
 
@@ -81,6 +87,10 @@ class CartPage extends BasePage {
     return cy.get(this.elements.cartItems).its('length')
   }
 
+  getCartItemRow(productName) {
+    return cy.get(this.elements.cartInfoTable).contains('tr', productName);
+  }
+
   removeItem(productName) {
     cy.contains(productName)
       .parent()
@@ -91,13 +101,11 @@ class CartPage extends BasePage {
   }
 
   updateItemQuantity(productName, quantity) {
-    cy.contains(productName)
-      .parent()
-      .parent()
-      .find(`[data-qa="${this.elements.updateQuantity}"]`)
+    this.getCartItemRow(productName)
+      .find('[data-qa="quantity"]')
       .clear()
-      .type(quantity)
-    return this
+      .type(quantity);
+    return this;
   }
 
   updateCart() {
@@ -212,7 +220,7 @@ class CartPage extends BasePage {
 
   // Assertions
   assertCartPageLoaded() {
-    this.getElement(this.elements.cartTitle).should('contain', 'Shopping Cart')
+    cy.get(this.elements.breadcrumb).should('contain.text', 'Shopping Cart')
     return this
   }
 
@@ -295,6 +303,59 @@ class CartPage extends BasePage {
   // Get order number
   getOrderNumber() {
     return this.getElement(this.elements.orderNumber).invoke('text')
+  }
+
+  getCartItemQuantity(productName) {
+    return this.getCartItemRow(productName).find('.cart_quantity_input');
+  }
+
+  removeItemFromCart(productName) {
+    this.getCartItemRow(productName).find('.cart_delete a').click();
+    return this;
+  }
+
+  getCartTable() {
+    return this.getElement(this.elements.cartTable);
+  }
+
+  getCartRows() {
+    return this.getElement(this.elements.cartRows);
+  }
+
+  getCartPrice() {
+    return this.getElement(this.elements.cartPrice);
+  }
+
+  getCartQuantity() {
+    return this.getElement(this.elements.cartQuantity);
+  }
+
+  getCartTotal() {
+    return this.getElement(this.elements.cartTotal);
+  }
+
+  getCartTotalPrice() {
+    return this.getElement(this.elements.cartTotalPrice);
+  }
+
+  getCartDeleteButton() {
+    return this.getElement(this.elements.cartDeleteButton);
+  }
+
+  getCartEmptyMessage() {
+    return cy.contains(this.elements.cartEmptyMessage);
+  }
+
+  getCartSubscribeInput() {
+    return this.getElement(this.elements.cartSubscribeInput);
+  }
+
+  getCartSubscribeButton() {
+    return this.getElement(this.elements.cartSubscribeButton);
+  }
+
+  getCartSubscribeSuccess() {
+    return cy.contains(this.elements.cartSubscribeSuccess);
   }
 }
 

@@ -1,8 +1,7 @@
-import HomePage from '../pages/HomePage.js'
+import { homePage } from '../pages/index.js'
+import { ASSERTION_TEXTS, URL_PATHS } from '../support/constants.js'
 
 describe('Home Page Tests', () => {
-  const homePage = new HomePage()
-
   beforeEach(() => {
     homePage.navigateToHome()
   })
@@ -20,17 +19,17 @@ describe('Home Page Tests', () => {
 
     it('should navigate to products page', () => {
       homePage.clickProducts()
-      cy.url().should('include', '/products')
+      cy.url().should('include', URL_PATHS.PRODUCTS)
     })
 
     it('should navigate to cart page', () => {
       homePage.clickCart()
-      cy.url().should('include', '/view_cart')
+      cy.url().should('include', URL_PATHS.CART)
     })
 
     it('should navigate to login page', () => {
       homePage.clickSignupLogin()
-      cy.url().should('include', '/login')
+      cy.url().should('include', URL_PATHS.LOGIN)
     })
   })
 
@@ -50,27 +49,27 @@ describe('Home Page Tests', () => {
     it('should handle empty search', () => {
       homePage.searchProduct('')
       // Should stay on home page or show all products
-      cy.url().should('include', '/')
+      cy.url().should('include', URL_PATHS.HOME)
     })
   })
 
   describe('Category Navigation', () => {
     it('should navigate to women category', () => {
       homePage.clickWomenCategory()
-      cy.url().should('include', '/category_products')
-      cy.get('body').should('contain', 'Women')
+      cy.url().should('include', URL_PATHS.CATEGORY_PRODUCTS)
+      homePage.getBody().should('contain', ASSERTION_TEXTS.CATEGORY_WOMEN)
     })
 
     it('should navigate to men category', () => {
       homePage.clickMenCategory()
-      cy.url().should('include', '/category_products')
-      cy.get('body').should('contain', 'Men')
+      cy.url().should('include', URL_PATHS.CATEGORY_PRODUCTS)
+      homePage.getBody().should('contain', ASSERTION_TEXTS.CATEGORY_MEN)
     })
 
     it('should navigate to kids category', () => {
       homePage.clickKidsCategory()
-      cy.url().should('include', '/category_products')
-      cy.get('body').should('contain', 'Kids')
+      cy.url().should('include', URL_PATHS.CATEGORY_PRODUCTS)
+      homePage.getBody().should('contain', ASSERTION_TEXTS.CATEGORY_KIDS)
     })
   })
 
@@ -83,17 +82,17 @@ describe('Home Page Tests', () => {
       const productName = 'Blue Top'
       homePage.addProductToCart(productName)
       // Should show success message (modal appears)
-      cy.get('.modal-content').should('be.visible')
-      cy.get('.modal-content').should('contain', 'Added!')
+      homePage.getModalContent().should('be.visible')
+      homePage.getModalContent().should('contain', 'Added!')
       // Close modal
-      cy.get('.modal-content .btn-success').click({force: true})
+      homePage.getModalCloseButton().click({force: true})
     })
 
     it('should view product details', () => {
       const productName = 'Blue Top'
       homePage.viewProduct(productName)
-      cy.url().should('include', '/product_details')
-      cy.get('body').should('contain', productName)
+      cy.url().should('include', URL_PATHS.PRODUCT_DETAILS)
+      homePage.getBody().should('contain', productName)
     })
 
     it('should display product prices', () => {
@@ -118,7 +117,7 @@ describe('Home Page Tests', () => {
   describe('Scroll Functionality', () => {
     it('should scroll to bottom and show scroll up button', () => {
       homePage.scrollToBottom()
-      cy.get("a[href='#top'] i.fa.fa-angle-up").should('be.visible')
+      homePage.getElement("a[href='#top'] i.fa.fa-angle-up").should('be.visible')
       homePage.clickScrollUp()
       // Should scroll back to top
       cy.window().its('scrollY').should('eq', 0)
@@ -150,7 +149,7 @@ describe('Home Page Tests', () => {
       
       homePage.navigateToHome()
       
-      cy.get('body').should('be.visible').then(() => {
+      homePage.getBody().should('be.visible').then(() => {
         const loadTime = Date.now() - startTime
         expect(loadTime).to.be.lessThan(5000) // 5 seconds
       })
@@ -159,7 +158,7 @@ describe('Home Page Tests', () => {
     it('should have all images loaded', () => {
       homePage.navigateToHome()
       
-      cy.get('img').each(($img) => {
+      homePage.getImages().each(($img) => {
         cy.wrap($img).should('be.visible')
         cy.wrap($img).should('have.attr', 'src')
       })
@@ -170,7 +169,7 @@ describe('Home Page Tests', () => {
     it('should have proper alt text for images', () => {
       homePage.navigateToHome()
       
-      cy.get('img').each(($img) => {
+      homePage.getImages().each(($img) => {
         cy.wrap($img).should('have.attr', 'alt')
       })
     })
@@ -179,7 +178,7 @@ describe('Home Page Tests', () => {
       homePage.navigateToHome()
       
       // Check for h1, h2, h3 tags
-      cy.get('h1, h2, h3').should('exist')
+      homePage.getHeadings().should('exist')
     })
   })
 }) 
