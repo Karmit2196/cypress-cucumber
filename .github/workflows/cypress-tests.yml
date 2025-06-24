@@ -38,9 +38,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Create allure-results directory
-      run: mkdir -p allure-results
-
     - name: Run Cypress tests
       uses: cypress-io/github-action@v6
       with:
@@ -50,41 +47,6 @@ jobs:
                github.event.inputs.test_type == 'smoke' && 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js' || 
                'cypress/e2e/*.cy.js' }}
         record: false
-
-    - name: Check allure-results directory
-      run: |
-        echo "Checking allure-results directory..."
-        ls -la allure-results || echo "allure-results directory is empty or doesn't exist"
-        find allure-results -type f | head -10 || echo "No files found in allure-results"
-
-    - name: Generate Allure Report
-      if: always()
-      run: |
-        if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
-          echo "Generating Allure report..."
-          npx allure-commandline generate allure-results
-          echo "Allure report generated successfully"
-        else
-          echo "No allure-results found or directory is empty. Skipping report generation."
-          mkdir -p allure-report
-          echo "<html><body><h1>No Allure Results Available</h1><p>No test results were generated for this run.</p></body></html>" > allure-report/index.html
-        fi
-
-    - name: Upload Allure Report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: allure-report-${{ matrix.browser }}-${{ github.event_name == 'schedule' && 'regression' || github.event.inputs.test_type }}
-        path: allure-report
-        if-no-files-found: ignore
-
-    - name: Upload Allure Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: allure-results-${{ matrix.browser }}-${{ github.event_name == 'schedule' && 'regression' || github.event.inputs.test_type }}
-        path: allure-results
-        if-no-files-found: ignore
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v4

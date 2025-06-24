@@ -14,13 +14,7 @@
     "test:chrome": "cypress run --browser chrome",
     "test:firefox": "cypress run --browser firefox",
     "test:mobile": "cypress run --config viewportWidth=375,viewportHeight=667",
-    "test:tablet": "cypress run --config viewportWidth=768,viewportHeight=1024",
-    "allure:generate": "npx allure-commandline generate allure-results",
-    "allure:serve": "npx allure-commandline serve allure-results",
-    "allure:open": "npx allure-commandline open allure-report",
-    "test:allure": "cypress run && npm run allure:generate",
-    "test:smoke:allure": "cypress run --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js' && npm run allure:generate",
-    "test:regression:allure": "cypress run --spec 'cypress/e2e/*.cy.js' && npm run allure:generate"
+    "test:tablet": "cypress run --config viewportWidth=768,viewportHeight=1024"
   },
   "keywords": [
     "cypress",
@@ -34,8 +28,6 @@
   "author": "Karmit Lalani",
   "license": "MIT",
   "devDependencies": {
-    "@shelex/cypress-allure-plugin": "^2.44.0",
-    "allure-commandline": "^2.27.0",
     "cypress": "^14.5.0"
   },
   "engines": {
