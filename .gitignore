@@ -10,6 +10,12 @@ cypress/screenshots/
 cypress/downloads/
 cypress/fixtures/example.json
 
+# Allure Reports
+allure-results/
+allure-report/
+allure-results.zip
+allure-report.zip
+
 # Environment variables
 .env
 .env.local

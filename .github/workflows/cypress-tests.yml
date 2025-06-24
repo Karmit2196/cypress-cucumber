@@ -48,6 +48,27 @@ jobs:
                'cypress/e2e/*.cy.js' }}
         record: false
 
+    - name: Generate Allure Report
+      if: always()
+      run: |
+        npm run allure:generate
+
+    - name: Upload Allure Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report-${{ matrix.browser }}-${{ github.event_name == 'schedule' && 'regression' || github.event.inputs.test_type }}
+        path: allure-report
+        if-no-files-found: ignore
+
+    - name: Upload Allure Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-results-${{ matrix.browser }}-${{ github.event_name == 'schedule' && 'regression' || github.event.inputs.test_type }}
+        path: allure-results
+        if-no-files-found: ignore
+
     - name: Upload screenshots
       uses: actions/upload-artifact@v4
       if: failure()
