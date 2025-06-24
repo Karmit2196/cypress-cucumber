@@ -48,9 +48,6 @@ jobs:
         browser: ${{ matrix.browser }}
         spec: 'cypress/e2e/*.cy.js'
         record: false
-        parallel: true
-        group: 'Regression Tests'
-        tag: 'nightly'
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v4
@@ -103,9 +100,6 @@ jobs:
                github.event.inputs.test_type == 'e2e' && 'cypress/e2e/e2e.cy.js' ||
                'cypress/e2e/*.cy.js' }}
         record: false
-        parallel: true
-        group: 'Manual Tests'
-        tag: 'manual'
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v4
