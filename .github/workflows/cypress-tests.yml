@@ -47,8 +47,6 @@ jobs:
       with:
         browser: ${{ matrix.browser }}
         spec: 'cypress/e2e/*.cy.js'
-        wait-on: 'http://localhost:3000'
-        wait-on-timeout: 120
         record: false
         parallel: true
         group: 'Regression Tests'
@@ -104,8 +102,6 @@ jobs:
                github.event.inputs.test_type == 'api' && 'cypress/e2e/api.cy.js' ||
                github.event.inputs.test_type == 'e2e' && 'cypress/e2e/e2e.cy.js' ||
                'cypress/e2e/*.cy.js' }}
-        wait-on: 'http://localhost:3000'
-        wait-on-timeout: 120
         record: false
         parallel: true
         group: 'Manual Tests'
