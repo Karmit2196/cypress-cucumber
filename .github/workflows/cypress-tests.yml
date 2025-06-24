@@ -4,10 +4,24 @@ on:
   schedule:
     # Run regression tests every night at 2 AM EST (7 AM UTC)
     - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'regression'
+        type: choice
+        options:
+        - smoke
+        - regression
+        - ui
+        - api
+        - e2e
 
 jobs:
   cypress-regression:
     runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
     strategy:
       fail-fast: false
       matrix:
@@ -53,5 +67,62 @@ jobs:
       if: always()
       with:
         name: cypress-videos-${{ matrix.browser }}
+        path: cypress/videos
+        if-no-files-found: ignore
+
+  cypress-manual:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox, edge]
+    
+    name: Cypress Manual (${{ matrix.browser }}) - ${{ github.event.inputs.test_type }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v6
+      with:
+        browser: ${{ matrix.browser }}
+        spec: |
+          ${{ github.event.inputs.test_type == 'smoke' && 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js' || 
+               github.event.inputs.test_type == 'regression' && 'cypress/e2e/*.cy.js' ||
+               github.event.inputs.test_type == 'ui' && 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js,cypress/e2e/e2e.cy.js' ||
+               github.event.inputs.test_type == 'api' && 'cypress/e2e/api.cy.js' ||
+               github.event.inputs.test_type == 'e2e' && 'cypress/e2e/e2e.cy.js' ||
+               'cypress/e2e/*.cy.js' }}
+        wait-on: 'http://localhost:3000'
+        wait-on-timeout: 120
+        record: false
+        parallel: true
+        group: 'Manual Tests'
+        tag: 'manual'
+
+    - name: Upload screenshots
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: cypress-screenshots-manual-${{ matrix.browser }}-${{ github.event.inputs.test_type }}
+        path: cypress/screenshots
+        if-no-files-found: ignore
+
+    - name: Upload videos
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cypress-videos-manual-${{ matrix.browser }}-${{ github.event.inputs.test_type }}
         path: cypress/videos
         if-no-files-found: ignore 
