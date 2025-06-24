@@ -7,95 +7,14 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test": "cypress run",
-    
-    "test:dev": "cypress run --config-file cypress.config.dev.js",
-    "test:qa": "cypress run --config-file cypress.config.qa.js",
-    "test:prod": "cypress run --config-file cypress.config.prod.js",
-    
     "test:home": "cypress run --spec 'cypress/e2e/home.cy.js'",
     "test:login": "cypress run --spec 'cypress/e2e/login.cy.js'",
-    "test:api": "cypress run --spec 'cypress/e2e/api.cy.js'",
-    "test:e2e": "cypress run --spec 'cypress/e2e/e2e.cy.js'",
-    
-    "test:home:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/home.cy.js'",
-    "test:login:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/login.cy.js'",
-    "test:api:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/api.cy.js'",
-    "test:e2e:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/e2e.cy.js'",
-    
-    "test:home:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/home.cy.js'",
-    "test:login:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/login.cy.js'",
-    "test:api:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/api.cy.js'",
-    "test:e2e:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/e2e.cy.js'",
-    
-    "test:home:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/home.cy.js'",
-    "test:login:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/login.cy.js'",
-    "test:api:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/api.cy.js'",
-    "test:e2e:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/e2e.cy.js'",
-    
+    "test:smoke": "cypress run --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js'",
+    "test:regression": "cypress run --spec 'cypress/e2e/*.cy.js'",
     "test:chrome": "cypress run --browser chrome",
     "test:firefox": "cypress run --browser firefox",
-    "test:edge": "cypress run --browser edge",
-    "test:headless": "cypress run --headless",
-    
-    "test:chrome:dev": "cypress run --config-file cypress.config.dev.js --browser chrome",
-    "test:firefox:dev": "cypress run --config-file cypress.config.dev.js --browser firefox",
-    "test:edge:dev": "cypress run --config-file cypress.config.dev.js --browser edge",
-    
-    "test:chrome:qa": "cypress run --config-file cypress.config.qa.js --browser chrome",
-    "test:firefox:qa": "cypress run --config-file cypress.config.qa.js --browser firefox",
-    "test:edge:qa": "cypress run --config-file cypress.config.qa.js --browser edge",
-    
-    "test:chrome:prod": "cypress run --config-file cypress.config.prod.js --browser chrome",
-    "test:firefox:prod": "cypress run --config-file cypress.config.prod.js --browser firefox",
-    "test:edge:prod": "cypress run --config-file cypress.config.prod.js --browser edge",
-    
     "test:mobile": "cypress run --config viewportWidth=375,viewportHeight=667",
-    "test:tablet": "cypress run --config viewportWidth=768,viewportHeight=1024",
-    "test:desktop": "cypress run --config viewportWidth=1920,viewportHeight=1080",
-    
-    "test:mobile:dev": "cypress run --config-file cypress.config.dev.js --config viewportWidth=375,viewportHeight=667",
-    "test:tablet:dev": "cypress run --config-file cypress.config.dev.js --config viewportWidth=768,viewportHeight=1024",
-    "test:desktop:dev": "cypress run --config-file cypress.config.dev.js --config viewportWidth=1920,viewportHeight=1080",
-    
-    "test:mobile:qa": "cypress run --config-file cypress.config.qa.js --config viewportWidth=375,viewportHeight=667",
-    "test:tablet:qa": "cypress run --config-file cypress.config.qa.js --config viewportWidth=768,viewportHeight=1024",
-    "test:desktop:qa": "cypress run --config-file cypress.config.qa.js --config viewportWidth=1920,viewportHeight=1080",
-    
-    "test:mobile:prod": "cypress run --config-file cypress.config.prod.js --config viewportWidth=375,viewportHeight=667",
-    "test:tablet:prod": "cypress run --config-file cypress.config.prod.js --config viewportWidth=768,viewportHeight=1024",
-    "test:desktop:prod": "cypress run --config-file cypress.config.prod.js --config viewportWidth=1920,viewportHeight=1080",
-    
-    "test:record": "cypress run --record",
-    "test:parallel": "cypress run --parallel",
-    "test:ci": "cypress run --headless --record --parallel",
-    
-    "test:ci:dev": "cypress run --config-file cypress.config.dev.js --headless --record --parallel",
-    "test:ci:qa": "cypress run --config-file cypress.config.qa.js --headless --record --parallel",
-    "test:ci:prod": "cypress run --config-file cypress.config.prod.js --headless --record --parallel",
-    
-    "test:smoke": "cypress run --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js'",
-    "test:smoke:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js'",
-    "test:smoke:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js'",
-    "test:smoke:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js'",
-    
-    "test:regression": "cypress run --spec 'cypress/e2e/*.cy.js'",
-    "test:regression:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/*.cy.js'",
-    "test:regression:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/*.cy.js'",
-    "test:regression:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/*.cy.js'",
-    
-    "test:ui": "cypress run --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js,cypress/e2e/e2e.cy.js'",
-    "test:ui:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js,cypress/e2e/e2e.cy.js'",
-    "test:ui:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js,cypress/e2e/e2e.cy.js'",
-    "test:ui:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js,cypress/e2e/e2e.cy.js'",
-    
-    "test:api:all": "cypress run --spec 'cypress/e2e/api.cy.js'",
-    "test:api:all:dev": "cypress run --config-file cypress.config.dev.js --spec 'cypress/e2e/api.cy.js'",
-    "test:api:all:qa": "cypress run --config-file cypress.config.qa.js --spec 'cypress/e2e/api.cy.js'",
-    "test:api:all:prod": "cypress run --config-file cypress.config.prod.js --spec 'cypress/e2e/api.cy.js'",
-    
-    "cypress:open:dev": "cypress open --config-file cypress.config.dev.js",
-    "cypress:open:qa": "cypress open --config-file cypress.config.qa.js",
-    "cypress:open:prod": "cypress open --config-file cypress.config.prod.js"
+    "test:tablet": "cypress run --config viewportWidth=768,viewportHeight=1024"
   },
   "keywords": [
     "cypress",
@@ -106,7 +25,7 @@
     "page-object-model",
     "automationexercise"
   ],
-  "author": "Your Name",
+  "author": "Karmit Lalani",
   "license": "MIT",
   "devDependencies": {
     "cypress": "^14.5.0"
@@ -117,10 +36,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/cypress-automationexercise-framework.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/cypress-automationexercise-framework/issues"
-  },
-  "homepage": "https://github.com/yourusername/cypress-automationexercise-framework#readme"
+    "url": "https://github.com/Karmit2196/cypress-framework"
+  }
 }

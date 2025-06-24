@@ -7,17 +7,16 @@ module.exports = defineConfig({
     viewportHeight: 720,
     video: false,
     screenshotOnRunFailure: true,
-    defaultCommandTimeout: 10000,
-    requestTimeout: 10000,
-    responseTimeout: 10000,
-    pageLoadTimeout: 30000,
+    defaultCommandTimeout: 15000,
+    requestTimeout: 15000,
+    responseTimeout: 15000,
+    pageLoadTimeout: 45000,
     watchForFileChanges: false,
     retries: {
       runMode: 2,
       openMode: 0
     },
     env: {
-      // Environment variables
       apiUrl: 'https://www.automationexercise.com/api',
       testUser: {
         email: 'test@example.com',
@@ -25,7 +24,6 @@ module.exports = defineConfig({
       }
     },
     setupNodeEvents(on, config) {
-      // implement node event listeners here
       on('task', {
         log(message) {
           console.log(message)

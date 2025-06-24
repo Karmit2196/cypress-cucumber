@@ -10,7 +10,7 @@
 3. [Project Structure](#project-structure)
 4. [Installation & Setup](#installation--setup)
 5. [Page Object Model (POM)](#page-object-model-pom)
-6. [Environment Configurations](#environment-configurations)
+6. [Configuration](#configuration)
 7. [Test Categories](#test-categories)
 8. [Custom Commands](#custom-commands)
 9. [Test Data Management](#test-data-management)
@@ -30,7 +30,6 @@ This Cypress framework is designed specifically for testing the [AutomationExerc
 
 ### 1.2 Key Features
 - **Page Object Model (POM)** implementation
-- **Multi-environment support** (Dev, QA, Production)
 - **Comprehensive test coverage** (UI, API, E2E)
 - **Custom commands** for common operations
 - **Data-driven testing** with fixtures
@@ -108,10 +107,7 @@ cypress-framework/
 ├── .github/
 │   └── workflows/
 │       └── cypress-tests.yml  # GitHub Actions workflow
-├── cypress.config.js          # Default Cypress configuration
-├── cypress.config.dev.js      # Development environment config
-├── cypress.config.qa.js       # QA environment config
-├── cypress.config.prod.js     # Production environment config
+├── cypress.config.js          # Cypress configuration
 ├── package.json               # Dependencies and scripts
 └── README.md                  # Framework documentation
 ```
@@ -172,10 +168,9 @@ npx cypress open
 ```
 
 ### 4.3 Initial Configuration
-1. **Environment Setup**: Choose appropriate environment configuration
-2. **Test Data**: Review and update test data in fixtures
-3. **Base URL**: Verify base URL in configuration files
-4. **Credentials**: Update test user credentials if needed
+1. **Test Data**: Review and update test data in fixtures
+2. **Base URL**: Verify base URL in configuration file
+3. **Credentials**: Update test user credentials if needed
 
 ---
 
@@ -273,77 +268,76 @@ class HomePage extends BasePage {
 
 ---
 
-## 6. Environment Configurations
+## 6. Configuration
 
-### 6.1 Development Environment (`cypress.config.dev.js`)
+### 6.1 Cypress Configuration (`cypress.config.js`)
 
-**Characteristics**:
-- **Video Recording**: Enabled for debugging
-- **Retry Logic**: 1 retry for faster feedback
-- **Timeouts**: Shorter timeouts (10-30 seconds)
-- **Log Level**: Debug for detailed logging
-- **Watch Mode**: Enabled for development
-
-**Configuration**:
-```javascript
-{
-  video: true,
-  retries: { runMode: 1, openMode: 0 },
-  defaultCommandTimeout: 10000,
-  pageLoadTimeout: 30000,
-  watchForFileChanges: true,
-  env: {
-    environment: 'development',
-    logLevel: 'debug'
-  }
-}
-```
-
-### 6.2 QA Environment (`cypress.config.qa.js`)
+The framework uses a single configuration file with optimized settings for testing:
 
 **Characteristics**:
-- **Video Recording**: Disabled for performance
+- **Video Recording**: Disabled for performance optimization
 - **Retry Logic**: 2 retries for stability
-- **Timeouts**: Medium timeouts (15-45 seconds)
-- **Log Level**: Info for balanced logging
-- **Watch Mode**: Disabled
+- **Timeouts**: Balanced timeouts (15-45 seconds)
+- **Screenshots**: Enabled on test failure
+- **Watch Mode**: Disabled for CI/CD compatibility
 
 **Configuration**:
 ```javascript
 {
+  baseUrl: 'https://www.automationexercise.com',
+  viewportWidth: 1280,
+  viewportHeight: 720,
   video: false,
-  retries: { runMode: 2, openMode: 0 },
+  screenshotOnRunFailure: true,
   defaultCommandTimeout: 15000,
+  requestTimeout: 15000,
+  responseTimeout: 15000,
   pageLoadTimeout: 45000,
   watchForFileChanges: false,
+  retries: {
+    runMode: 2,
+    openMode: 0
+  },
   env: {
-    environment: 'qa',
-    logLevel: 'info'
+    apiUrl: 'https://www.automationexercise.com/api',
+    testUser: {
+      email: 'test@example.com',
+      password: 'test123'
+    }
   }
 }
 ```
 
-### 6.3 Production Environment (`cypress.config.prod.js`)
+### 6.2 Environment Variables
 
-**Characteristics**:
-- **Video Recording**: Disabled for performance
-- **Retry Logic**: 3 retries for reliability
-- **Timeouts**: Longer timeouts (20-60 seconds)
-- **Log Level**: Error only for minimal logging
-- **Watch Mode**: Disabled
+The configuration includes essential environment variables:
 
-**Configuration**:
 ```javascript
-{
-  video: false,
-  retries: { runMode: 3, openMode: 0 },
-  defaultCommandTimeout: 20000,
-  pageLoadTimeout: 60000,
-  watchForFileChanges: false,
-  env: {
-    environment: 'production',
-    logLevel: 'error'
+env: {
+  apiUrl: 'https://www.automationexercise.com/api',
+  testUser: {
+    email: 'test@example.com',
+    password: 'test123'
   }
+}
+```
+
+### 6.3 Custom Tasks
+
+The configuration includes custom tasks for logging:
+
+```javascript
+setupNodeEvents(on, config) {
+  on('task', {
+    log(message) {
+      console.log(message)
+      return null
+    },
+    table(message) {
+      console.table(message)
+      return null
+    }
+  })
 }
 ```
 
@@ -684,13 +678,12 @@ The GitHub Actions workflow (`cypress-tests.yml`) provides automated testing wit
 - **Push Events**: Automatic testing on code pushes
 - **Pull Requests**: Testing on PR creation/updates
 - **Scheduled Runs**: Daily testing at 2 AM UTC
-- **Manual Dispatch**: Manual trigger with parameters
+- **Manual Dispatch**: Manual trigger with test type selection
 
 #### Jobs
-1. **cypress-run**: Parallel testing in dev/qa environments
-2. **cypress-prod**: Production testing (main branch only)
-3. **cypress-manual**: Manual workflow execution
-4. **test-results**: Results summary and PR comments
+1. **cypress-run**: Parallel testing across multiple browsers
+2. **cypress-manual**: Manual workflow execution
+3. **test-results**: Results summary and PR comments
 
 ### 10.2 Workflow Configuration
 
@@ -700,38 +693,35 @@ strategy:
   fail-fast: false
   matrix:
     browser: [chrome, firefox, edge]
-    environment: [dev, qa]
 ```
 
 #### Parallel Execution
 - Multiple browsers simultaneously
-- Multiple environments simultaneously
 - Reduced execution time
 - Better resource utilization
 
 ### 10.3 Manual Workflow Dispatch
 
 #### Parameters
-- **Environment**: dev, qa, prod
 - **Test Type**: smoke, regression, ui, api, e2e
 
 #### Usage
 1. Navigate to Actions tab
 2. Select "Cypress Tests" workflow
 3. Click "Run workflow"
-4. Choose parameters
+4. Choose test type
 5. Execute
 
 ### 10.4 Artifacts and Reporting
 
 #### Screenshots
 - Uploaded on test failure
-- Environment and browser specific
+- Browser specific
 - Available for download
 
 #### Videos
 - Uploaded for all test runs
-- Environment and browser specific
+- Browser specific
 - Useful for debugging
 
 #### PR Comments
@@ -743,72 +733,17 @@ strategy:
 
 ## 11. Running Tests
 
-### 11.1 Environment-Specific Commands
+### 11.1 Basic Commands
 
-#### Development Environment
 ```bash
-# All tests
-npm run test:dev
+# Run all tests
+npm run test
 
-# Specific test categories
-npm run test:home:dev
-npm run test:login:dev
-npm run test:api:dev
-npm run test:e2e:dev
+# Open Cypress Test Runner
+npm run cypress:open
 
-# Browser-specific
-npm run test:chrome:dev
-npm run test:firefox:dev
-npm run test:edge:dev
-
-# Responsive testing
-npm run test:mobile:dev
-npm run test:tablet:dev
-npm run test:desktop:dev
-```
-
-#### QA Environment
-```bash
-# All tests
-npm run test:qa
-
-# Specific test categories
-npm run test:home:qa
-npm run test:login:qa
-npm run test:api:qa
-npm run test:e2e:qa
-
-# Browser-specific
-npm run test:chrome:qa
-npm run test:firefox:qa
-npm run test:edge:qa
-
-# Responsive testing
-npm run test:mobile:qa
-npm run test:tablet:qa
-npm run test:desktop:qa
-```
-
-#### Production Environment
-```bash
-# All tests
-npm run test:prod
-
-# Specific test categories
-npm run test:home:prod
-npm run test:login:prod
-npm run test:api:prod
-npm run test:e2e:prod
-
-# Browser-specific
-npm run test:chrome:prod
-npm run test:firefox:prod
-npm run test:edge:prod
-
-# Responsive testing
-npm run test:mobile:prod
-npm run test:tablet:prod
-npm run test:desktop:prod
+# Run tests in headless mode
+npm run cypress:run
 ```
 
 ### 11.2 Test Type Commands
@@ -817,47 +752,62 @@ npm run test:desktop:prod
 ```bash
 # Quick validation tests
 npm run test:smoke
-npm run test:smoke:dev
-npm run test:smoke:qa
-npm run test:smoke:prod
 ```
 
 #### Regression Tests
 ```bash
 # Full test suite
 npm run test:regression
-npm run test:regression:dev
-npm run test:regression:qa
-npm run test:regression:prod
 ```
 
 #### UI Tests
 ```bash
 # User interface tests
 npm run test:ui
-npm run test:ui:dev
-npm run test:ui:qa
-npm run test:ui:prod
 ```
 
 #### API Tests
 ```bash
 # API endpoint tests
 npm run test:api:all
-npm run test:api:all:dev
-npm run test:api:all:qa
-npm run test:api:all:prod
 ```
 
-### 11.3 CI/CD Commands
+#### Specific Test Files
+```bash
+# Run specific test files
+npm run test:home
+npm run test:login
+npm run test:api
+npm run test:e2e
+```
+
+### 11.3 Browser-Specific Commands
+
+```bash
+# Run tests in specific browsers
+npm run test:chrome
+npm run test:firefox
+npm run test:edge
+
+# Run tests in headless mode
+npm run test:headless
+```
+
+### 11.4 Responsive Testing
+
+```bash
+# Run tests with different viewports
+npm run test:mobile
+npm run test:tablet
+npm run test:desktop
+```
+
+### 11.5 CI/CD Commands
 
 #### Continuous Integration
 ```bash
 # Headless execution
 npm run test:ci
-npm run test:ci:dev
-npm run test:ci:qa
-npm run test:ci:prod
 ```
 
 #### Parallel Execution
@@ -872,17 +822,12 @@ npm run test:parallel
 npm run test:record
 ```
 
-### 11.4 Debugging Commands
+### 11.6 Debugging Commands
 
 #### Open Cypress UI
 ```bash
 # Default configuration
 npx cypress open
-
-# Environment-specific
-npm run cypress:open:dev
-npm run cypress:open:qa
-npm run cypress:open:prod
 ```
 
 #### Debug Mode
