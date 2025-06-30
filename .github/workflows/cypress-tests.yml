@@ -88,8 +88,8 @@ jobs:
         username: ${{ secrets.SMTP_USERNAME }}
         password: ${{ secrets.SMTP_PASSWORD }}
         subject: "Cypress Automation Results: ${{ job.status }}"
-        to: karmit12lalani@gmail.com
-        from: Cypress Automation <karmit12lalani@gmail.com>
+        to: karmit1lalani@gmail.com
+        from: Cypress Automation <karmit1lalani@gmail.com>
         body: |
           ${{ github.event_name == 'schedule' && 'Weekly Cypress Automation Results' || 'Cypress Automation Results' }}
 
