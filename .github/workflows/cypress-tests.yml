@@ -2,8 +2,8 @@ name: Cypress Tests
 
 on:
   schedule:
-    # Run regression tests every night at 2 AM EST (7 AM UTC)
-    - cron: '0 7 * * *'
+    # Run regression tests every Monday at 2 AM EST (7 AM UTC)
+    - cron: '0 7 * * 1'
   workflow_dispatch:
     inputs:
       test_type:
@@ -62,4 +62,34 @@ jobs:
       with:
         name: cypress-videos-${{ matrix.browser }}-${{ github.event_name == 'schedule' && 'regression' || github.event.inputs.test_type }}
         path: cypress/videos
-        if-no-files-found: ignore 
+        if-no-files-found: ignore
+
+    - name: Upload Mochawesome HTML Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: mochawesome-report-${{ matrix.browser }}
+        path: cypress/results/mochawesome-report
+        if-no-files-found: ignore
+        retention-days: 2
+
+    - name: Send Mochawesome Report via Email
+      uses: mattnotmitt/email-with-attachments@v1.4.0
+      if: always()
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "Cypress Automation Results: ${{ job.status }}"
+        to: karmit12lalani@gmail.com
+        from: Cypress Automation <karmit12lalani@gmail.com>
+        body: |
+          ${{ github.event_name == 'schedule' && 'Weekly Cypress Automation Results' || 'Cypress Automation Results' }}
+
+          Status: ${{ job.status }}
+
+          ${{ job.status == 'success' && 'All tests passed successfully.' || 'Some tests failed. Please review the attached report.' }}
+
+          This is an automated email.
+        attachments: cypress/results/mochawesome-report/mochawesome.html 

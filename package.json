@@ -9,12 +9,13 @@
     "test": "cypress run",
     "test:home": "cypress run --spec 'cypress/e2e/home.cy.js'",
     "test:login": "cypress run --spec 'cypress/e2e/login.cy.js'",
-    "test:smoke": "cypress run --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js'",
-    "test:regression": "cypress run --spec 'cypress/e2e/*.cy.js'",
+    "test:smoke": "cypress run --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js' && npm run posttest",
+    "test:regression": "cypress run --spec 'cypress/e2e/*.cy.js' && npm run posttest",
     "test:chrome": "cypress run --browser chrome",
     "test:firefox": "cypress run --browser firefox",
     "test:mobile": "cypress run --config viewportWidth=375,viewportHeight=667",
-    "test:tablet": "cypress run --config viewportWidth=768,viewportHeight=1024"
+    "test:tablet": "cypress run --config viewportWidth=768,viewportHeight=1024",
+    "posttest": "mochawesome-merge cypress/results/*.json > mochawesome.json && npx mochawesome-report-generator mochawesome.json -o cypress/results/mochawesome-report --inline"
   },
   "keywords": [
     "cypress",
@@ -28,7 +29,9 @@
   "author": "Karmit Lalani",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^14.5.0"
+    "cypress": "^14.5.0",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.3.1"
   },
   "engines": {
     "node": ">=16.0.0",

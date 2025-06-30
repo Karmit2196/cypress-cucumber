@@ -23,6 +23,13 @@ module.exports = defineConfig({
         password: 'test123'
       }
     },
+    reporter: 'mochawesome',
+    reporterOptions: {
+      reportDir: 'cypress/results',
+      overwrite: false,
+      html: false,
+      json: true
+    },
     setupNodeEvents(on, config) {
       on('task', {
         log(message) {
