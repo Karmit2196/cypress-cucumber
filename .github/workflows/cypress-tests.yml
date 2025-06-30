@@ -48,6 +48,12 @@ jobs:
                'cypress/e2e/*.cy.js' }}
         record: false
 
+    - name: Generate Mochawesome HTML report
+      run: npm run posttest
+
+    - name: List results directory
+      run: ls -lR cypress/results || echo "No results directory"
+
     - name: Upload screenshots
       uses: actions/upload-artifact@v4
       if: failure()
