@@ -74,7 +74,7 @@ jobs:
         retention-days: 2
 
     - name: Send Mochawesome Report via Email
-      uses: mattnotmitt/email-with-attachments@v1.4.0
+      uses: dawidd6/action-send-mail@v3
       if: always()
       with:
         server_address: smtp.gmail.com
@@ -92,4 +92,5 @@ jobs:
           ${{ job.status == 'success' && 'All tests passed successfully.' || 'Some tests failed. Please review the attached report.' }}
 
           This is an automated email.
-        attachments: cypress/results/mochawesome-report/mochawesome.html 
+        attachments: cypress/results/mochawesome-report/mochawesome.html
+        secure: true 
