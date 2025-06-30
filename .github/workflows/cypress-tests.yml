@@ -99,4 +99,11 @@ jobs:
 
           This is an automated email.
         attachments: cypress/results/mochawesome-report/mochawesome.html
-        secure: true 
+        secure: true
+
+    - name: Post Test Results Summary
+      if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      run: |
+        echo "## Cypress Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+        echo "[View Test Artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY 
