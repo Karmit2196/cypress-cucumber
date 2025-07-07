@@ -1,6 +1,9 @@
-const { defineConfig } = require('cypress')
+import { defineConfig } from 'cypress'
+import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
+import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-preprocessor'
+import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 
-module.exports = defineConfig({
+export default defineConfig({
   e2e: {
     baseUrl: 'https://www.automationexercise.com',
     viewportWidth: 1280,
@@ -30,7 +33,13 @@ module.exports = defineConfig({
       html: false,
       json: true
     },
+    specPattern: 'cypress/e2e/**/*.feature',
+    supportFile: 'cypress/support/e2e.ts',
+    fixturesFolder: 'cypress/fixtures',
+    screenshotsFolder: 'cypress/screenshots',
+    videosFolder: 'cypress/videos',
     setupNodeEvents(on, config) {
+      // Add custom tasks
       on('task', {
         log(message) {
           console.log(message)
@@ -41,6 +50,16 @@ module.exports = defineConfig({
           return null
         }
       })
+
+      // Add cucumber preprocessor plugin
+      addCucumberPreprocessorPlugin(on, config)
+
+      // Add esbuild preprocessor for TypeScript support
+      on('file:preprocessor', createBundler({
+        plugins: [createEsbuildPlugin(config)],
+      }))
+
+      return config
     },
   },
 }) 

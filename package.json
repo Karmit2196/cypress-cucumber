@@ -7,10 +7,11 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test": "cypress run",
-    "test:home": "cypress run --spec 'cypress/e2e/home.cy.js'",
-    "test:login": "cypress run --spec 'cypress/e2e/login.cy.js'",
-    "test:smoke": "cypress run --spec 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js' && npm run posttest",
-    "test:regression": "cypress run --spec 'cypress/e2e/*.cy.js' && npm run posttest",
+    "test:home": "cypress run --spec 'cypress/e2e/home.feature'",
+    "test:login": "cypress run --spec 'cypress/e2e/login.feature'",
+    "test:e2e": "cypress run --spec 'cypress/e2e/e2e.feature'",
+    "test:smoke": "cypress run --spec 'cypress/e2e/home.feature,cypress/e2e/login.feature' && npm run posttest",
+    "test:regression": "cypress run --spec 'cypress/e2e/*.feature' && npm run posttest",
     "test:chrome": "cypress run --browser chrome",
     "test:firefox": "cypress run --browser firefox",
     "test:mobile": "cypress run --config viewportWidth=375,viewportHeight=667",
@@ -29,9 +30,16 @@
   "author": "Karmit Lalani",
   "license": "MIT",
   "devDependencies": {
-    "cypress": "^14.5.0",
+    "@badeball/cypress-cucumber-preprocessor": "^22.2.0",
+    "@types/cypress": "^0.1.6",
+    "@types/jquery": "^3.5.32",
+    "@types/node": "^24.0.10",
+    "chai": "^5.2.0",
+    "cypress": "^14.5.1",
     "mochawesome": "^7.1.3",
-    "mochawesome-merge": "^4.3.1"
+    "mochawesome-merge": "^4.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=16.0.0",
@@ -40,5 +48,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Karmit2196/cypress-framework"
+  },
+  "dependencies": {
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.5"
   }
 }

@@ -1,0 +1,65 @@
+{
+  "loginUsers": {
+    "validUsers": [
+      {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "password": "test123",
+        "expectedResult": "logged in"
+      },
+      {
+        "name": "Jane Smith",
+        "email": "jane@example.com", 
+        "password": "test456",
+        "expectedResult": "logged in"
+      }
+    ],
+    "invalidUsers": [
+      {
+        "email": "invalid@example.com",
+        "password": "wrongpass",
+        "expectedResult": "error message"
+      },
+      {
+        "email": "empty@example.com",
+        "password": "",
+        "expectedResult": "validation error"
+      }
+    ]
+  },
+  "searchData": {
+    "validSearches": [
+      {
+        "term": "dress",
+        "expectedResults": ["Blue Top", "Red Dress"]
+      },
+      {
+        "term": "shirt",
+        "expectedResults": ["Men Tshirt"]
+      }
+    ],
+    "invalidSearches": [
+      {
+        "term": "nonexistentproduct",
+        "expectedResults": []
+      }
+    ]
+  },
+  "registrationData": {
+    "validRegistrations": [
+      {
+        "name": "Test User 1",
+        "email": "test1@example.com",
+        "password": "test123",
+        "firstName": "Test",
+        "lastName": "User1",
+        "address": "123 Test St",
+        "country": "United States",
+        "state": "Test State",
+        "city": "Test City",
+        "zipcode": "12345",
+        "mobileNumber": "1234567890"
+      }
+    ]
+  }
+} 

@@ -12,7 +12,7 @@ export const ASSERTION_TEXTS = {
   BLUE_TOP: 'Blue Top',
   MEN_TSHIRT: 'Men Tshirt',
   SLEEVELESS_DRESS: 'Sleeveless Dress',
-};
+} as const;
 
 export const URL_PATHS = {
   LOGIN: '/login',
@@ -24,4 +24,4 @@ export const URL_PATHS = {
   DELETE_ACCOUNT: '/delete_account',
   CONTACT_US: '/contact_us',
   HOME: '/',
-}; 
+} as const; 
