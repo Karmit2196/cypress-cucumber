@@ -16,7 +16,7 @@
     "test:firefox": "cypress run --browser firefox",
     "test:mobile": "cypress run --config viewportWidth=375,viewportHeight=667",
     "test:tablet": "cypress run --config viewportWidth=768,viewportHeight=1024",
-    "posttest": "mochawesome-merge cypress/results/*.json > mochawesome.json && npx mochawesome-report-generator mochawesome.json -o cypress/results/mochawesome-report --inline"
+    "posttest": "mochawesome-merge cypress/results/mochawesome-report/*.json > cypress/results/mochawesome-report/mochawesome.json && npx mochawesome-report-generator cypress/results/mochawesome-report/mochawesome.json -o cypress/results/mochawesome-report --inline"
   },
   "keywords": [
     "cypress",
