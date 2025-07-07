@@ -42,10 +42,7 @@ jobs:
       uses: cypress-io/github-action@v6
       with:
         browser: ${{ matrix.browser }}
-        spec: |
-          ${{ github.event_name == 'schedule' && 'cypress/e2e/*.cy.js' ||
-               github.event.inputs.test_type == 'smoke' && 'cypress/e2e/home.cy.js,cypress/e2e/login.cy.js' || 
-               'cypress/e2e/*.cy.js' }}
+        spec: cypress/e2e/**/*.feature
         record: false
 
     - name: Generate Mochawesome HTML report
