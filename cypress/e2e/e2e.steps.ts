@@ -15,7 +15,14 @@ Then('the subscription should be successful', () => {
 });
 
 When('I test responsive design on {string}', (viewport: string) => {
-  cy.viewport(viewport);
+  // Map common device names to viewport sizes
+  const viewports: Record<string, [number, number]> = {
+    'iphone-6': [375, 667],
+    'ipad-2': [768, 1024],
+    'macbook-15': [1440, 900],
+  };
+  const size = viewports[viewport] || [1280, 720];
+  cy.viewport(size[0], size[1]);
   homePage.navigateToHome();
   homePage.assertHomePageLoaded();
 });
@@ -68,7 +75,7 @@ When('I click the contact us home button', () => {
 });
 
 Then('I should be on the home page', () => {
-  cy.url().should('eq', Cypress.config().baseUrl + '/');
+  cy.url().should('eq', `${Cypress.config('baseUrl')}/`);
 });
 
 Given('I am on the products page', () => {
